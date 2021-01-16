@@ -17,21 +17,25 @@ export const CreateProducts = () => {
    
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [size, setSize] = useState([]);
+  const [color, setColor] = useState([]);
   const [file, setFile] = useState('');
   const [image, setImage] = useState('');
   const [description, setDescription] = useState('');
   const [categories, setCategories] = useState([]);
+  const [brands, setBrands] = useState([]);
+  const [brandId, setBrandId] = useState('');
   const [cat, setCat] = useState('');
   const [productPictures, setProductPictures] = useState([]);
   const [productData, setProductData] = useState({
    title: '',
    subTitle: '',
    price: '',
+   offer: ''
 
 
   });
 
-  const { title, subTitle, price } = productData;
+  const { title, subTitle, price, offer } = productData;
 
   /***********************************************onChange *******************************************/
       const handleProductChange = (e) => {
@@ -48,11 +52,7 @@ export const CreateProducts = () => {
 
         ])
       }
-        
-
-      console.log(size);
-      // // console.log(file);
-
+      
 
       function handleSizeChange(value) {
            setSize(
@@ -64,7 +64,22 @@ export const CreateProducts = () => {
      const onCatChange = value => {
         setCat(value);
       };
+
+      function handleBrandChange(value) {
+        setBrandId(
+          value
+
+        );
+       }
+
+       function handleColorChange(value) {
+        setColor(
+          value
+
+        );
+       }
     
+
 
     /************************************************ Submit **********************************************/  
         
@@ -75,16 +90,20 @@ export const CreateProducts = () => {
       data.append('subTitle', subTitle);
       data.append('description', description);
       data.append('price', price);
+      data.append('offer', offer);
       data.append('cat', cat);
+      data.append('brandId', brandId);
       for(let sizes of size) {
         data.append('sizes', sizes);
+       }
+       for(let colors of color) {
+        data.append('colors', colors);
        }
 
       for(let pic of file) {
        data.append('file', pic);
       }
       axios.post('/api/products/create', data).then(res => {
-          console.log(res);
           if (res.status === 200) {
           swal('Great!', res.data.successMessage, 'success');
           }
@@ -96,7 +115,7 @@ export const CreateProducts = () => {
       }
   
  
-      //********************************************************Modal ****************************************//
+      //******************************************************** Modal ****************************************//
 
       const showModal = () => {
         setIsModalVisible(true);
@@ -108,10 +127,16 @@ export const CreateProducts = () => {
         setIsModalVisible(false);
       };
 
-  /******************************************Get Categories *******************************************/    
-  const fetchCategories = () => {
-    const response = axios.get('/api/categories').then(data => {
+  /****************************************** Get Categories & Brands *******************************************/    
+  const fetchCategories =  () => {
+      axios.get('/api/categories').then(data => {
       setCategories(data.data);
+    })
+  }
+
+  const fetchBrands = () => {
+      axios.get('/api/categories/brands').then(data => {
+      setBrands(data.data.brands);
     })
   }
 
@@ -119,6 +144,7 @@ export const CreateProducts = () => {
   useEffect(() => {
 
     fetchCategories();
+    fetchBrands();
     return () => {
     }
   }, [isModalVisible]);
@@ -160,8 +186,51 @@ export const CreateProducts = () => {
                     <Option key = 'XL'>XL</Option>
                     <Option key = 'XXL'>XXL</Option>
                       
+                </Select>
+                 </div>
+
+                 <div className = 'my-3'>
+                <Select
+                      mode="tags"
+                      placeholder="Select Color.."
+                      defaultValue={[]}
+                      onChange={handleColorChange}
+                      style={{ width: '80%', marginLeft: '22px', marginTop: '6px' }}
+                    > 
+                    <Option key = 'White'>White</Option>
+                    <Option key = 'Black'>Black</Option>
+                    <Option key = 'Brown'>Brown</Option>
+                    <Option key = 'Red'>Red</Option>
+                    <Option key = 'Green'>Green</Option>
+                    <Option key = 'Gray'>Gray</Option>
+                    <Option key = 'Blue'>Blue</Option>
+                      
+                </Select>
+                 </div>
+
+                    <div className = 'ml-4'>
+                     <Select
+                            style={{ width: 380 }}
+                            placeholder="Select a Brand"
+                            onChange={handleBrandChange}
+                           >
+                        {
+                          brands.map(brand => {
+                            return(
+                              <Option key = {brand._id}>{brand.name}</Option>
+
+                            )
+                          })
+                           
+                        }
+                          
                     </Select>
                     </div>
+                         
+                 <div className="form-group mt-4" style = {{paddingLeft: '62px'}}>
+                    <input type="Number" className="form-control mb-2" id = 'offer' name = 'offer' placeholder="Enter Offer" onChange = {handleProductChange} />
+                </div>
+                
 
                     <div className = 'my-3'>
                       <ReactQuill placeholder = "Product Description" theme="snow" value={description} onChange={setDescription}/>

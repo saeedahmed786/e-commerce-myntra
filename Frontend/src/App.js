@@ -4,6 +4,7 @@ import { DefaultComp } from './Components/404'
 import { About } from './Components/About'
 import { AdminPanel } from './Components/Admin/AdminPanel'
 import { CreateCategory } from './Components/Admin/CreateCategory'
+import { GetBrands } from './Components/Admin/GetBrands'
 import { GetCategory } from './Components/Admin/GetCategories'
 import { GetProducts } from './Components/Admin/GetProducts'
 import { Layout } from './Components/Admin/Layout'
@@ -22,6 +23,7 @@ import { Products } from './Components/Products'
       <Route exact path = '/' component = {Home}/>
       <Route exact path = '/admin' component = {AdminPanel}/>
       <Route exact path = '/admin/all-categories' component = {GetCategory}/>
+      <Route exact path = '/admin/all-brands' component = {GetBrands}/>
       <Route exact path = '/admin/create-category' component = {CreateCategory}/>
       <Route exact path = '/admin/get-products' component = {GetProducts}/>
       <Route exact path = '/admin/users' component = {Users}/>

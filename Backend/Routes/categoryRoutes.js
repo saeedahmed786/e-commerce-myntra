@@ -156,6 +156,66 @@ router.put('/update/:id', async(req, res) => {
 
 
 /***********************************************************Brands *******************************************/
+router.post('/brands/create', async (req, res) => {
+    const brands = new Brand({
+        name: req.body.name
+    });
+
+    const ifAlreadyExists =  await Brand.findOne({name: req.body.name});
+    if(ifAlreadyExists) {
+        res.status(201).json({errorMessage: `Brand ${req.body.name} already exists`});
+    } else {
+        await brands.save((error, brand) => {
+            if(error) {
+                res.status(400).json({errorMessage: 'Failed to create brand. Please try again'});
+            }
+            if(brand) {
+                res.status(200).json({successMessage: `Brand ${brand.name} created successfully`});
+            }
+          
+        })
+
+    }
+
+ 
+})
+
+router.get('/brands', async(req, res) => {
+      await Brand.find().sort('1').exec((error, brands) => {
+          if(error) {
+              res.status(404).json({errorMessage: 'No Brands Found'});
+          }
+          if(brands) {
+              res.status(200).json({brands});
+          }
+      })
+});
+
+router.get('/brands/:id', async(req, res) => {
+
+    await await Brand.findById({_id: req.params.id}).exec((error, brand) => {
+        if(error) {
+            res.status(404).json({errorMessage: `Brand ${req.params.id} not found`});
+        }
+        if(brand) {
+            res.status(200).json({brand});
+        }
+    })
+})
+
+router.delete('/brands/delete/:id', async(req, res) => {
+    console.log(req.params.id);
+    await Brand.findByIdAndRemove({_id: req.params.id}).exec((error, brand) => {
+        if(brand) {
+            res.status(200).json({successMessage: `Brand ${brand.name} deleted successfully`});
+        } 
+        if(error) {
+            res.status(400).json({errorMessage: `Unable to delete brand. Please try again`});
+        }
+    })
+    
+
+})
 
 
 module.exports = router;

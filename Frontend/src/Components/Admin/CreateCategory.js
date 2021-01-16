@@ -6,6 +6,7 @@ import { Modal, Button, Select } from 'antd';
 import { PlusOutlined  } from '@ant-design/icons';
 import { Layout } from './Layout';
 import { CreateProducts } from './CreateProducts';
+import { CreateBrand } from './createBrand';
 const { Option } = Select;
 
 
@@ -253,6 +254,9 @@ export const CreateCategory = (props) => {
             </span>
             <span>
               <CreateProducts/>
+            </span>
+            <span>
+              <CreateBrand/>
             </span>
             </div>
             </Layout>

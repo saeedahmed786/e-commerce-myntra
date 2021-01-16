@@ -17,6 +17,10 @@ const productShema = new mongoonse.Schema({
         type: Number, 
         required: true
     },
+    offer: {
+        type: Number, 
+        required: true
+    },
     productSizes: [
         {
             size: {
@@ -24,7 +28,15 @@ const productShema = new mongoonse.Schema({
             required: true
             }
     }
-],
+   ],
+   productColors: [
+    {
+        color: {
+        type: String, 
+        required: true
+        }
+        }
+        ],
     productPictures: [
         {
             img: {
@@ -33,7 +45,8 @@ const productShema = new mongoonse.Schema({
             }
         }
     ],
-    category:  {type: mongoonse.Schema.Types.ObjectId, ref : 'Category', required: true}
+    category:  {type: mongoonse.Schema.Types.ObjectId, ref : 'Category', required: true},
+    brand:  {type: mongoonse.Schema.Types.ObjectId, ref : 'Brand', required: true}
     
 
 

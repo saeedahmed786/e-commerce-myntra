@@ -134,7 +134,7 @@ html a:hover {
  }
 
 
- /***********************************Editor******************************************/
+ /*********************************** Create Products ******************************************/
 
 
  div.ant-select-tree-list-holder {
@@ -148,6 +148,15 @@ div.ant-select-tree-list-scrollbar {
     display: none !important;
 }
 
+div.rc-virtual-list-scrollbar {
+    display: none;
+}
+
+div.rc-virtual-list-holder {
+    max-height: 256px !important;
+    overflow-y: scroll !important;
+    overflow-anchor: none !important;
+}
 
 
 

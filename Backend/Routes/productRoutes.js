@@ -31,8 +31,8 @@ const router = express.Router();
 // }
 
 router.get('/get', async (req, res) => {
-  const products =  await Product.find({}).select('_id title subTitle description productSizes productPictures price category')
-                                          .populate('category').exec();
+  const products =  await Product.find({}).select('_id title subTitle brand description productSizes productPictures price category')
+                                          .populate('category brand').exec();
 
                                        
    res.status(200).json({products});
@@ -45,7 +45,6 @@ router.get('/get', async (req, res) => {
 
 
 router.post('/create', upload.array('file'), async (req, res) => {
-  // console.log(req.body.sizes);
   const uploader = async (path) => await cloudinary.uploads(path, 'Images')
   const urls = [];
         const files = req.files;
@@ -73,14 +72,24 @@ router.post('/create', upload.array('file'), async (req, res) => {
             }
             });
         }
+        if(req.body.colors && req.body.colors.length > 0) {
+          productColors = req.body.colors.map(saveColor => {
+            return{
+              color: saveColor
+            }
+            });
+        }
  
         const product = new Product({
           title: req.body.title,
           subTitle: req.body.subTitle,
           description: req.body.description,
           price: req.body.price,
+          offer: req.body.offer,
           productSizes,
+          productColors,
           category: req.body.cat,
+          brand: req.body.brandId,
           productPictures
         });
 
@@ -90,7 +99,6 @@ router.post('/create', upload.array('file'), async (req, res) => {
               res.status(400).json({errorMessage: 'Failed to create product. Please try again', error})
             }
          else if(result) {
-            console.log(result);
             res.status(200).send({successMessage: 'Porduct created successfully', result});
           } 
           else return null;

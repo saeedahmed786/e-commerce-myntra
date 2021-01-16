@@ -23,12 +23,6 @@ export const GetCategory = (props) => {
   const [editedCategory, setEditedCategory] = useState('');
   const [editCatId, setEditCatId] = useState('');
 
-//   const [catData, setCatData] = useState({
-//     editedCategory: '',
-//       });
-
-// const {editedCategory } = catData;
-
 
   const fetchCategories = () => {
     const response = axios.get('/api/categories').then(data => {
@@ -126,10 +120,10 @@ export const GetCategory = (props) => {
                   
                     <th scope="col">{cat.name}</th>
                     <th>
-                      <Link className='btn' style={{ textDecoration: 'none' }} onClick = {() => {getEditCatHandler(cat._id); showModal() }}><i className="fa fa-edit"></i>Edit</Link>
+                      <Link className='btn' style={{ textDecoration: 'none' }} onClick = {() => {getEditCatHandler(cat._id); showModal() }}><i className="fa fa-edit"></i></Link>
                                    {
                                      cat.children.length === 0 ?
-                                     <button className='btn' onClick= {() => deleteHandler(cat._id)}><i className="fa fa-trash-alt"></i>Delete</button>
+                                     <button className='btn' onClick= {() => deleteHandler(cat._id)}><i className="fa fa-trash-alt"></i></button>
                                           :
                                           null
 
@@ -149,10 +143,10 @@ export const GetCategory = (props) => {
                                   <th>
 
                                     
-                                    <Link className='btn' style={{ textDecoration: 'none' }} onClick = {() => {getEditCatHandler(subCat._id); showModal() }}><i className="fa fa-edit"></i>Edit</Link> &nbsp;
+                                    <Link className='btn' style={{ textDecoration: 'none' }} onClick = {() => {getEditCatHandler(subCat._id); showModal() }}><i className="fa fa-edit"></i></Link>
                                           {
                                             subCat.children.length === 0 ?
-                                            <button className='btn' onClick= {() => deleteHandler(subCat._id)}><i className="fa fa-trash-alt"></i>Delete</button>
+                                            <button className='btn' onClick= {() => deleteHandler(subCat._id)}><i className="fa fa-trash-alt"></i></button>
                                                 :
                                                 null
 
@@ -168,7 +162,7 @@ export const GetCategory = (props) => {
                                          <tr key = {child._id}>
                                            <th>{child.name}</th>
                                            <th>
-                                           <button className='btn' style={{ textDecoration: 'none' }} onClick = {() => {getEditCatHandler(child._id); showModal() }}><i className="fa fa-edit"></i>Edit</button> &nbsp;
+                                           <button className='btn' style={{ textDecoration: 'none' }} onClick = {() => {getEditCatHandler(child._id); showModal() }}><i className="fa fa-edit"></i></button>
                                            <Modal title="Edit Categories" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}>     
                                               <form  className = 'text-center' onSubmit = {editHandler}>
                                               <h4 className = 'mb-5'>Edit Your Category</h4>
@@ -195,7 +189,7 @@ export const GetCategory = (props) => {
                                               </form>
                                               </Modal>
 
-                                              <button className='btn' onClick= {() => deleteHandler(child._id)}><i className="fa fa-trash-alt"></i>Delete</button>
+                                              <button className='btn' onClick= {() => deleteHandler(child._id)}><i className="fa fa-trash-alt"></i></button>
                                              
                                            </th>
                                          </tr>

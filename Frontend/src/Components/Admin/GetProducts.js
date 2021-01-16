@@ -50,9 +50,9 @@ export const GetProducts = () => {
                     <tr>
                     <th scope="col">Title</th>
                     <th scope="col">Sub-title</th>
-                    {/* <th scope="col">Description</th> */}
                     <th scope="col">Price</th>
                     <th scope="col">Category</th>
+                    <th scope="col">Brand</th>
                     
                     {/* <th scope="col">Pictures</th> */}
                     </tr>
@@ -67,6 +67,7 @@ export const GetProducts = () => {
                             {/* <td>    { <div style = {{height: '100px' ,overflowY: 'scroll'}} dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(prod.description) }} /> }</td> */}
                             <td>Rs.{prod.price}</td>
                             <td>{prod.category.name}</td>
+                            <td>{prod.brand.name}</td>
                             {/* {
                                 prod.productPictures.map(pic => {
                                     return (
