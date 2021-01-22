@@ -2,8 +2,6 @@ const express = require('express');
 const Category = require('../Models/categoryModel');
 const Brand = require('../Models/brandCategoryModel');
 
-
-
 const router = express.Router();
 
 function getAllCategories (categories, parentId = null) {
@@ -25,8 +23,6 @@ function getAllCategories (categories, parentId = null) {
     }
     return categoryList;
 }
-
-
 
 router.get('/', async (req, res) => {
     Category.find({})
@@ -109,17 +105,6 @@ router.post('/child-sub-category/create', async(req, res) => {
 
 });
 
-
-router.delete('/delete/:id', async(req, res) => {
-    const deleteCategory = await Category.findByIdAndDelete({_id: req.params.id})
-    if(deleteCategory) {
-        res.status(200).json({successMessage: `Category ${deleteCategory.name} has been deleted successfully`});
-    } else {
-        res.status(400).json({errorMessage: 'Category could not be deleted. Please try again'});
-    }
-
-});
-
 router.get('/edit/:id', async(req, res) => {
     const editCategory = await Category.findById({_id: req.params.id});
     if(!editCategory.parentId){
@@ -153,9 +138,46 @@ router.put('/update/:id', async(req, res) => {
 
 });
 
+router.delete('/delete/:id', async(req, res) => {
+    const deleteCategory = await Category.findByIdAndDelete({_id: req.params.id})
+    if(deleteCategory) {
+        res.status(200).json({successMessage: `Category ${deleteCategory.name} has been deleted successfully`});
+    } else {
+        res.status(400).json({errorMessage: 'Category could not be deleted. Please try again'});
+    }
+
+});
+
+
 
 
 /***********************************************************Brands *******************************************/
+
+router.get('/brands', async(req, res) => {
+    await Brand.find().sort('1').exec((error, brands) => {
+        if(error) {
+            res.status(404).json({errorMessage: 'No Brands Found'});
+        }
+        if(brands) {
+            res.status(200).json({brands});
+        }
+    })
+});
+
+router.get('/brands/:id', async(req, res) => {
+
+    await await Brand.findById({_id: req.params.id}).exec((error, brand) => {
+        if(error) {
+            res.status(404).json({errorMessage: `Brand ${req.params.id} not found`});
+        }
+        if(brand) {
+            res.status(200).json({brand});
+        }
+    })
+});
+
+
+
 router.post('/brands/create', async (req, res) => {
     const brands = new Brand({
         name: req.body.name
@@ -180,27 +202,21 @@ router.post('/brands/create', async (req, res) => {
  
 })
 
-router.get('/brands', async(req, res) => {
-      await Brand.find().sort('1').exec((error, brands) => {
-          if(error) {
-              res.status(404).json({errorMessage: 'No Brands Found'});
-          }
-          if(brands) {
-              res.status(200).json({brands});
-          }
-      })
-});
+router.put('/brands/update/:id', async(req, res) => {
+   const brand =  await Brand.findById({_id: req.params.id});
+   if(brand) {
+       brand.name = req.body.name;
 
-router.get('/brands/:id', async(req, res) => {
-
-    await await Brand.findById({_id: req.params.id}).exec((error, brand) => {
-        if(error) {
-            res.status(404).json({errorMessage: `Brand ${req.params.id} not found`});
-        }
-        if(brand) {
-            res.status(200).json({brand});
-        }
-    })
+      const editBrand =  brand.save();
+      if(editBrand) {
+          res.status(200).json({successMessage: `Brand name changed to ${req.body.name} successfully`});
+      } else {
+          res.status(400).json({errorMessage: 'Failed to update brand name'});
+      }
+   }   
+   else {
+    res.status(404).json({errorMessage: 'Brand not found'});
+}
 })
 
 router.delete('/brands/delete/:id', async(req, res) => {

@@ -2,7 +2,6 @@ import { Button, message, Select, TreeSelect, Upload } from 'antd';
 import Modal from 'antd/lib/modal/Modal';
 import React, { useEffect, useState } from 'react'
 import { PlusOutlined, UploadOutlined } from '@ant-design/icons';
-import MultiImageInput from 'react-multiple-image-input';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import axios from 'axios';
@@ -19,13 +18,11 @@ export const CreateProducts = () => {
   const [size, setSize] = useState([]);
   const [color, setColor] = useState([]);
   const [file, setFile] = useState('');
-  const [image, setImage] = useState('');
   const [description, setDescription] = useState('');
   const [categories, setCategories] = useState([]);
   const [brands, setBrands] = useState([]);
   const [brandId, setBrandId] = useState('');
   const [cat, setCat] = useState('');
-  const [productPictures, setProductPictures] = useState([]);
   const [productData, setProductData] = useState({
    title: '',
    subTitle: '',
@@ -254,7 +251,6 @@ export const CreateProducts = () => {
                        null
                      }
                      </ul>
-                     {/* <button className = 'btn btn-outline-success' onClick = {uploadImage}>Upload</button> */}
                   </div>  
                    
                   
@@ -267,7 +263,6 @@ export const CreateProducts = () => {
                       dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
                       placeholder="Please select"
                       allowClear
-                      // multiple
                       treeDefaultExpandAll
                       onChange={onCatChange}
                     >

@@ -10,30 +10,49 @@ export const GetBrands = () => {
     const [brands, setBrands] = useState([]);
     const [getBrand, setGetBrand] = useState('');
     const [editBrand, setEditBrand] = useState('');
+    const [editBrandId, setEditBrandId] = useState('');
     const [success, setSuccess] = useState(false);
     const [isModalVisible, setIsModalVisible] = useState(false);
 
 
     
+    useEffect(() => {
+        fetchBrands();
+        return () => {
+            
+        }
+    }, [success]);
 
-    const handleBrandChange = (e) => {
-        console.log(e.target.value);
+
+/**************************************************On Change ***********************************************/
+    
+  const handleBrandChange = (e) => {
+        setGetBrand(
+            e.target.value
+        )
     }
+
+
+/**************************************************On Submit ***********************************************/
     const submitHandler = (e) => {
         e.preventDefault();
-        // axios.post('/api/categories/brands/create', {name : brand.toUpperCase()}).then(res => {
-        //   if(res.status === 200) {
-        //   swal('Great', res.data.successMessage, 'success');
-        //     }
-        //   else if(res.status === 201) {
-        //     swal('Duplicate Error', res.data.errorMessage, 'error');
-        //   }
-        //   else {
-        //     swal('Error', 'Brand not created. Please try again', 'error');
-        //   }
-        // })
+        axios.put(`/api/categories/brands/update/${editBrandId}`, {name : getBrand.toUpperCase()}).then(res => {
+          if(res.status === 200) {
+              setSuccess(true);
+          swal('Great', res.data.successMessage, 'success');
+          setSuccess(false);
+            }
+          else if(res.status === 201) {
+            swal('Duplicate Error', res.data.errorMessage, 'error');
+          }
+          else {
+            swal('Error', 'Brand not created. Please try again', 'error');
+          }
+        })
       }
-    
+
+
+/************************************************** Modal ***********************************************/
       const showModal = () => {
         setIsModalVisible(true);
       };
@@ -46,16 +65,9 @@ export const GetBrands = () => {
         setIsModalVisible(false);
       };
 
-
-
-  useEffect(() => {
-      fetchBrands();
-      return () => {
-          
-      }
-  }, [success]);
-
-            const fetchBrands = async() => {
+      
+    /************************************************** Fetch Brands ***********************************************/
+         const fetchBrands = async() => {
                 await axios.get('/api/categories/brands').then(res => {
                     setBrands(res.data.brands);
                 })
@@ -64,6 +76,7 @@ export const GetBrands = () => {
           
 
   const editHandler = (brandId) => {
+      setEditBrandId(brandId);
        axios.get(`/api/categories/brands/${brandId}`).then(res => {
            setSuccess(true);
            setGetBrand(res.data.brand.name);
@@ -100,32 +113,30 @@ export const GetBrands = () => {
                 </tr>
             </thead>
             <tbody>
-               {
+                 {
                    brands.map(brand => {
                        return(
                            
                         <tr key = {brand._id}>
                         <td>{brand.name}</td>
-                        <td>
                         <button className='btn' style={{ textDecoration: 'none' }} onClick = {() => {editHandler(brand._id); showModal()}}><i className="fa fa-edit"></i></button>  &nbsp;
-                        <Modal title="Edit Brand" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}>     
+                        
+                        <button className='btn'><i className="fa fa-trash-alt" onClick = {() => deleteHandler(brand._id)}></i></button>
+                        </tr>
+                       )
+                   })
+               }
+               <Modal title="Edit Brand" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}>     
                                               <form  className = 'text-center' onSubmit = {submitHandler}>
                                               <h4 className = 'mb-5'>Edit Your Brand</h4>
                                            
                                                   <div className="form-group mt-4" style = {{paddingLeft: '62px'}}> 
-                                                      <input type="text" className="form-control mb-2 border" id = 'editedBrand' name = 'editedBrand' value = {getBrand} onChange = {handleBrandChange} />
+                                                      <input type="text" className="form-control mb-2 border" id = 'editedBrand' name = 'editedBrand' onChange = {handleBrandChange} value = {getBrand}   />
                                                   </div> 
                                              
                                               <button type="submit" className="btn btn-outline-danger mt-4">Submit</button>
                                               </form>
                                               </Modal>
-                        <button className='btn'><i className="fa fa-trash-alt" onClick = {() => deleteHandler(brand._id)}></i></button>
-                        </td>
-                        </tr>
-
-                       )
-                   })
-               }
                 
             </tbody>
             </table>

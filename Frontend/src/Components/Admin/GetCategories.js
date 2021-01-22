@@ -82,6 +82,8 @@ export const GetCategory = (props) => {
     setEditCategory(e.target.value);
 }
 
+console.log(editCategory);
+
 
 
   const showModal = () => {

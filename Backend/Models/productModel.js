@@ -41,7 +41,9 @@ const productShema = new mongoonse.Schema({
         {
             img: {
                 type: String,
-                required: true
+            },
+            cloudinary_id: {
+                type : String
             }
         }
     ],
