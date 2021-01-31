@@ -15,6 +15,9 @@ const WOMEN_CATEGORY_LIST_FAILURE = 'WOMEN_CATEGORY_LIST_FAILURE';
 const MEN_CATEGORY_LIST_REQUEST = 'MEN_CATEGORY_LIST_REQUEST';
 const MEN_CATEGORY_LIST_SUCCESS = 'MEN_CATEGORY_LIST_SUCCESS';
 const MEN_CATEGORY_LIST_FAILURE = 'MEN_CATEGORY_LIST_FAILURE';
+const GET_PRODUCT_SUCCESS = 'GET_PRODUCT_SUCCESS';
+const GET_PRODUCT_REQUEST = 'GET_PRODUCT_REQUEST';
+const GET_PRODUCT_FAIL = 'GET_PRODUCT_FAIL';
 
 /*********************************Category and Sub-Category Reducers********************************************************/ 
 
@@ -66,6 +69,31 @@ const getMenCategoryListReducer = (state =  {menCategories: []}, action) => {
     }
  }
 
+ const getProductReducer = (state = {product : {}}, action) => {
+     switch (action.type) {
+         case GET_PRODUCT_REQUEST:
+             return{
+                 loading: true
+             };
+         case GET_PRODUCT_SUCCESS:
+                 return{
+                     loading: false,
+                     product: action.payload
+              };
+         case GET_PRODUCT_FAIL:
+                return{
+                    loading: false,
+                    error: action.payload
+                }    
+
+             
+           
+     
+         default: return state;
+            
+     }
+ }
+
 
  export const getMenCategories = () => async (dispatch) => {
      try {
@@ -89,12 +117,23 @@ const getMenCategoryListReducer = (state =  {menCategories: []}, action) => {
     }
 }
 
+export const getProductById = (productId) => async (dispatch) => {
+    try {
+        dispatch({type: GET_PRODUCT_REQUEST});
+        const {data} = await axios.get('/api/products/' + productId);
+        dispatch({type: GET_PRODUCT_SUCCESS, payload: data});
+        } catch (error) {
+            dispatch({type: GET_PRODUCT_FAIL, payload: error.errorMessage})
+        
+    }
+}
 
  /*****************************************Combining Redcers******************************************/
 
  const reducer = combineReducers({
      men: getMenCategoryListReducer,
-     women: getWomenCategoryListReducer
+     women: getWomenCategoryListReducer,
+     getProduct: getProductReducer
  });
 
  const composeEnhancer = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;

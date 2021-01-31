@@ -27,6 +27,7 @@ export const AdminSideBar = () => {
                 <Menu.Item key="2"><Link to = '/admin/create-category'>Create Categories</Link></Menu.Item>
                 <Menu.Item key="3"><Link to = '/admin/all-categories'>List of Categories</Link></Menu.Item>
                 <Menu.Item key="brand"><Link to = '/admin/all-brands'>List of Brands</Link></Menu.Item>
+                <Menu.Item key="price-range"><Link to = '/admin/all-price-range'>Price Ranges</Link></Menu.Item>
                 </SubMenu>
                 <Menu.Item key="1">
                    <Link to = '/admin/get-products'>Products</Link>

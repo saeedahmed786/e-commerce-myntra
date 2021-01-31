@@ -7,6 +7,13 @@ const brandSchema = new mongoose.Schema({
         trim: true,
         unique: true
     },
+    img: {
+        type: String,
+    },
+    cloudinary_id: {
+        type : String
+    },
+
    
 }, {timestamps: true}
 );

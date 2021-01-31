@@ -16,20 +16,46 @@ router.get('/get', async (req, res) => {
                                           .populate('category brand').exec();
 
                                        
-   res.status(200).json({products});
+   res.status(200).send({products});
 });
 
 
 router.get('/:id', async(req, res) => {
-     console.log(req.params.id);
       
      const findProduct = await Product.findById({_id: req.params.id}).select('_id title productColors offer subTitle brand description productSizes productPictures price category')
                                                                       .populate('category brand').exec();
      if(findProduct) {
-       res.status(200).json({findProduct});
+       res.status(200).send({findProduct});
      }
 
     });
+
+  router.get('/product/:id', async(req, res) => {
+      
+      const findProduct = await Product.findById({_id: req.params.id});
+      if(findProduct) {
+        res.status(200).send(findProduct);
+      }
+ 
+     });  
+
+ router.get('/get/:id', async(req, res) => {
+   console.log(req.params.id);
+   const findCat = await Category.findOne({_id: req.params.id});
+   const findProducts = await Product.find({category: findCat._id}).select('_id title productColors offer subTitle brand description productSizes productPictures price category')
+                                                                    .populate('category brand').exec();
+   if(findProducts) {
+     res.status(200).json({findProducts});
+   }  
+ })   
+
+ router.get('/productsByBrand/get/:id', async(req, res) => {
+  const findProducts = await Product.find({brand: req.params.id}).select('_id title productColors offer subTitle brand description productSizes productPictures price category')
+                                                                   .populate('category brand').exec();
+  if(findProducts) {
+    res.status(200).json({findProducts});
+  }  
+})   
 
  router.post('/create', upload.array('file'), async (req, res) => {
   const uploader = async (path) => await cloudinary.uploads(path, 'Images')
@@ -77,6 +103,7 @@ router.get('/:id', async(req, res) => {
             productColors,
             category: req.body.cat,
             brand: req.body.brandId,
+            priceRange: req.body.priceId,
             productPictures
             
           });
@@ -179,12 +206,6 @@ router.put('/update/:id', upload.any(),async(req, res) => {
       else {
         res.status(404).json({errorMessage: 'Product not found'});
       }
-
-     
-      
-
-   
-   
     });
 
 

@@ -1,6 +1,12 @@
 const express = require('express');
 const Category = require('../Models/categoryModel');
 const Brand = require('../Models/brandCategoryModel');
+const Price = require('../Models/priceModel');
+const upload = require('./multer');
+const cloudinary = require('./cloudinary');
+const cloudinaryCon = require('./cloudinaryConfig');
+
+
 
 const router = express.Router();
 
@@ -59,19 +65,28 @@ router.post('/main-category/create', async(req, res) => {
 });
 
 
-router.post('/sub-category/create', async(req, res) => {
-    const category = new Category({
-        name: req.body.name,
-        parentId: req.body.parentId
-    });
-
-    if(req.body.parentId) {
-        category.parentId === req.body.parentId
-    }
+router.post('/sub-category/create', upload.single('file'), async(req, res) => {
+  
     const ifAlreadyExists = await Category.findOne({name: req.body.name});
     if(ifAlreadyExists) {
         res.status(201).json({errorMessage: `Category ${req.body.name} already exists`})
     } else {
+        const uploader = async(path) => await cloudinary.uploads(path, 'Images');
+
+        const {path}   = req.file;
+        const newPath = await uploader(path);
+
+        const category = new Category({
+            name: req.body.name,
+            parentId: req.body.parentId,
+            img: newPath.url,
+            cloudinary_id: newPath.id
+        });
+    
+        if(req.body.parentId) {
+            category.parentId === req.body.parentId
+        }
+
     const newCategory = category.save();
     if(newCategory) {
         res.status(200).json(`Category ${req.body.name} created successfully`);
@@ -81,22 +96,31 @@ router.post('/sub-category/create', async(req, res) => {
   }
 });
 
-router.post('/child-sub-category/create', async(req, res) => {
-    const saveSubCat = new Category({
-        name: req.body.name,
-        parentId: req.body.parentId
-    });
-
-    if(req.body.parentId) {
-        saveSubCat.parentId === req.body.parentId
-    }
-    
+router.post('/child-sub-category/create', upload.single('file') ,async(req, res) => {
+     
     const ifAlreadyExists = await Category.findOne({name: req.body.name});
     if(ifAlreadyExists) {
         res.status(201).json({errorMessage: `Sub-Category ${req.body.name} already Exists`});
     } else {
-        const savedSubCat =  await saveSubCat.save();
-        if(savedSubCat) {
+        const uploader = async(path) => await cloudinary.uploads(path, 'Images');
+
+        const {path}   = req.file;
+        const newPath = await uploader(path);
+
+        const saveSubCat = new Category({
+            name: req.body.name,
+            parentId: req.body.parentId,
+            img: newPath.url,
+            cloudinary_id: newPath.id
+        });
+        
+    if(req.body.parentId) {
+        saveSubCat.parentId === req.body.parentId
+    }
+
+    const savedSubCat =  await saveSubCat.save();
+
+    if(savedSubCat) {
             res.status(200).json({successMessage: `Sub-Category ${req.body.name} is created successfully!`});
         } else {
             res.status(400).json({errorMessage: `Unable to create Sub-Category ${req.body.name}. Please Try Again in a while`})
@@ -122,10 +146,29 @@ router.get('/edit/:id', async(req, res) => {
 
 });
 
-router.put('/update/:id', async(req, res) => {
+router.put('/update/:id', upload.single('file'), async(req, res) => {
     const editCategory = await Category.findById({_id : req.params.id});
+    if(req.file) {
+        const imgUrl = editCategory.cloudinary_id;
+        const del =  cloudinaryCon.uploader.destroy(imgUrl);
+    }
     if(editCategory) {
-        editCategory.name = req.body.cat;
+        if(req.file) { 
+    
+        const uploader = async(path) => await cloudinary.uploads(path, 'Images');
+
+        const {path}   = req.file;
+         newPath = await uploader(path);
+         editCategory.name = req.body.cat;
+         editCategory.img = newPath.url;
+         editCategory.cloudinary_id = newPath.id;
+        }
+    
+        else if(req.body.image) {
+            editCategory.name = req.body.cat;
+            editCategory.img = req.body.image;
+           
+        }
 
         const editedCategory = editCategory.save();
         if(editedCategory) {
@@ -139,8 +182,11 @@ router.put('/update/:id', async(req, res) => {
 });
 
 router.delete('/delete/:id', async(req, res) => {
-    const deleteCategory = await Category.findByIdAndDelete({_id: req.params.id})
+    const deleteCategory = await Category.findById({_id: req.params.id})
     if(deleteCategory) {
+        const imgUrl = deleteCategory.cloudinary_id;
+        const del =  cloudinaryCon.uploader.destroy(imgUrl);
+         deleteCategory.remove();
         res.status(200).json({successMessage: `Category ${deleteCategory.name} has been deleted successfully`});
     } else {
         res.status(400).json({errorMessage: 'Category could not be deleted. Please try again'});
@@ -178,15 +224,26 @@ router.get('/brands/:id', async(req, res) => {
 
 
 
-router.post('/brands/create', async (req, res) => {
-    const brands = new Brand({
-        name: req.body.name
-    });
+router.post('/brands/create', upload.single('file'), async (req, res) => {
+   
 
     const ifAlreadyExists =  await Brand.findOne({name: req.body.name});
     if(ifAlreadyExists) {
         res.status(201).json({errorMessage: `Brand ${req.body.name} already exists`});
     } else {
+
+        const uploader = async(path) => await cloudinary.uploads(path, 'Images');
+
+        const {path}   = req.file;
+        const newPath = await uploader(path);
+
+        const brands = new Brand({
+            name: req.body.name,
+            img: newPath.url,
+            cloudinary_id: newPath.id
+
+        });
+
         await brands.save((error, brand) => {
             if(error) {
                 res.status(400).json({errorMessage: 'Failed to create brand. Please try again'});
@@ -202,27 +259,51 @@ router.post('/brands/create', async (req, res) => {
  
 })
 
-router.put('/brands/update/:id', async(req, res) => {
+router.put('/brands/update/:id', upload.single('file'), async(req, res) => {
    const brand =  await Brand.findById({_id: req.params.id});
+   if(req.file) {
+    const imgUrl = brand.cloudinary_id;
+    const del =  cloudinaryCon.uploader.destroy(imgUrl);
+}
    if(brand) {
-       brand.name = req.body.name;
+       if(req.file) {
+        const uploader = async(path) => await cloudinary.uploads(path, 'Images');
 
-      const editBrand =  brand.save();
-      if(editBrand) {
-          res.status(200).json({successMessage: `Brand name changed to ${req.body.name} successfully`});
-      } else {
-          res.status(400).json({errorMessage: 'Failed to update brand name'});
-      }
+        const {path}   = req.file;
+         newPath = await uploader(path);
+         brand.name = req.body.name;
+         brand.img = newPath.url;
+         brand.cloudinary_id = newPath.id
+
+       } else {
+        brand.name = req.body.name;
+        brand.img = req.body.image;
+
+       }
+
+      const editBrand =  brand.save((error, savedBrand) => {
+          if(error) {
+            res.status(400).json({errorMessage: 'Failed to update brand name'});
+
+          }
+          if(savedBrand) {
+            res.status(200).json({successMessage: `Brand name changed to ${req.body.name} successfully`});
+
+          }
+      });
+     
    }   
    else {
     res.status(404).json({errorMessage: 'Brand not found'});
 }
-})
+});
 
 router.delete('/brands/delete/:id', async(req, res) => {
-    console.log(req.params.id);
-    await Brand.findByIdAndRemove({_id: req.params.id}).exec((error, brand) => {
+    await Brand.findById({_id: req.params.id}).exec((error, brand) => {
         if(brand) {
+            const imgUrl = brand.cloudinary_id;
+            const del =  cloudinaryCon.uploader.destroy(imgUrl);
+            brand.remove();
             res.status(200).json({successMessage: `Brand ${brand.name} deleted successfully`});
         } 
         if(error) {
@@ -231,7 +312,92 @@ router.delete('/brands/delete/:id', async(req, res) => {
     })
     
 
-})
+});
+
+
+/********************************************Price Ranges  ****************************************/
+ 
+  router.get('/price-ranges', async(req, res) => {
+      await Price.find().exec((error, range) => {
+          if(error) {
+              res.status(404).json({errorMessage: 'No Price Found'});
+          }
+          if(range) {
+              res.status(200).json({range});
+          }
+      })
+  })
+
+
+ router.post('/price-range/create', async(req, res) => {
+     const min = req.body.min;
+     const max = req.body.max;
+     const ifAlreadyExists = await Price.findOne({minPrice: min, maxPrice: max});
+     if(ifAlreadyExists) {
+        res.status(201).json({errorMessage: `Price Range ${min} & ${max} already exists`});
+     } else {
+     const prices = new Price({
+         minPrice: req.body.min,
+         maxPrice: req.body.max
+     });
+
+    await prices.save((error, range) => {
+        if(error) {
+            res.status(400).json({errorMessage: 'Failed to create Price Range. Please try again'});
+        }
+        if(range) {
+            res.status(200).json({successMessage: `Price Range ${range.minPrice} & ${range.maxPrice} created successfully`});
+        }
+
+    });
+ }
+     
+ });
+
+
+ router.get('/price-range/:id', async(req, res) => {
+     const findPrice = await Price.findById({_id: req.params.id});
+     if(findPrice) {
+         res.status(200).json({findPrice});
+     } else {
+         res.status(404).json({errorMessage: 'No Price Range'});
+     }
+ })
+
+ router.put('/price-range/update/:id', async(req, res) => {
+       console.log(req.params.id);
+    const findPrice =  await Price.findById({_id: req.params.id});
+        
+        if(findPrice) {
+            findPrice.minPrice = req.body.min,
+            findPrice.maxPrice = req.body.max
+        }
+        await findPrice.save((error, savedPrice) => {
+            if(error) {
+              res.status(400).json({errorMessage: 'Failed to update Price Range'});
+  
+            }
+            if(savedPrice) {
+              res.status(200).json({successMessage: `Price Range changed to ${req.body.min} & ${req.body.max} successfully`});
+  
+            }
+        });
+     
+ });
+
+ router.delete('/price-range/delete/:id', async(req, res) => {
+    await Price.findById({_id: req.params.id}).exec((error, range) => {
+        if(range) {
+            range.remove();
+            res.status(200).json({successMessage: `Price Range ${range.minPrice} & ${range.maxPrice} deleted successfully`});
+        } 
+        if(error) {
+            res.status(400).json({errorMessage: `Unable to delete Price Range. Please try again`});
+        }
+    })
+    
+
+});
 
 
 module.exports = router;

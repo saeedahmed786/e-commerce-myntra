@@ -13,6 +13,13 @@ const categorySchema = new mongoose.Schema({
     parentId: {
         type: String
     }, 
+          img: {
+                type: String,
+            },
+            cloudinary_id: {
+                type : String
+            },
+      
    
 }, {timestamps: true}
 );

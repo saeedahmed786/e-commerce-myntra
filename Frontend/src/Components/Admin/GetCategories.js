@@ -5,8 +5,10 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { Layout } from './Layout';
 import swal from 'sweetalert';
-import { Select } from 'antd';
+import { Badge, Select } from 'antd';
 import Modal from 'antd/lib/modal/Modal';
+import { DeleteOutlined } from '@ant-design/icons';
+
 
 const { Option } = Select;
 
@@ -22,7 +24,8 @@ export const GetCategory = (props) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editedCategory, setEditedCategory] = useState('');
   const [editCatId, setEditCatId] = useState('');
-
+  const [file, setFile] = useState('');
+   const [image, setImage] = useState('');
 
   const fetchCategories = () => {
     const response = axios.get('/api/categories').then(data => {
@@ -47,9 +50,11 @@ export const GetCategory = (props) => {
         console.log(res);
             if(res.data.parentCat){
               setEditCategory(res.data.category.name);
-            setEditParentCat(res.data.parentCat.name);
+              setEditParentCat(res.data.parentCat.name);
+              setImage(res.data.category.img)
             } else {
               setEditCategory(res.data.category.name);
+              setImage(res.data.category.img)
             }
       });
        
@@ -58,7 +63,12 @@ export const GetCategory = (props) => {
 
     const editHandler = (e) => {
       e.preventDefault();
-      axios.put(`/api/categories/update/${editCatId}`, {cat: editCategory}).then(res => {
+      let data = new FormData();
+      data.append('cat', editCategory);
+      data.append('image', image);
+      data.append('file', file);
+
+      axios.put(`/api/categories/update/${editCatId}`, data).then(res => {
             setSuccess(true);
             swal('Good Job!', res.data.successMessage, 'success');
             setSuccess(false);
@@ -78,13 +88,18 @@ export const GetCategory = (props) => {
 
     /********************************************************Editing Categories******************************/
 
-  const handleCatChange = (e) => {
-    setEditCategory(e.target.value);
-}
+      const handleCatChange = (e) => {
+        setEditCategory(e.target.value);
+    }
+    const handleImageChange = (e) => {
+      setFile(
+        e.target.files[0]
+      );
+    }
 
-console.log(editCategory);
-
-
+    const handleRemovePresentImage = name => {
+      setImage(null);
+  }
 
   const showModal = () => {
     setIsModalVisible(true);
@@ -176,13 +191,30 @@ console.log(editCategory);
                                                   <div className="form-group mt-4" style = {{paddingLeft: '62px'}}> 
                                                       <input type="text" className="form-control mb-2 border" id = 'editedCategory' name = 'editedCategory' value = {editCategory}  onChange = {handleCatChange} />
                                                   </div> 
+                                                  <div className = 'my-3'>
+                                                  <input type="file" name = 'file' multiple onChange = {handleImageChange}/>
+                                                  </div>
+                                                  <div>
+                                                  <Badge className = 'mt-4 mb-2' count={<a onClick={() =>handleRemovePresentImage(image)}><DeleteOutlined style = {{marginLeft: '10px'}} /></a>}>
+                                                  <img width = '100' height = '100' src = {image} alt = 'images' className="head-example" />
+                                                </Badge>
+                                                </div> 
                                                   </>  
 
                                                   :
-
+                                                  <>
                                                   <div className="form-group mt-4" style = {{paddingLeft: '62px'}}> 
                                                       <input type="text" className="form-control mb-2 border" id = 'editedCategory' name = 'editedCategory' value = {editCategory}  onChange = {handleCatChange} />
                                                   </div> 
+                                                  <div className = 'my-3'>
+                                                  <input type="file" name = 'file' multiple onChange = {handleImageChange}/>
+                                                  </div>
+                                                  <div>
+                                                  <Badge className = 'mt-4 mb-2' count={<a onClick={() =>handleRemovePresentImage(editCategory.img)}><DeleteOutlined style = {{marginLeft: '10px'}} /></a>}>
+                                                  <img width = '100' height = '100' src = {image} alt = 'images' className="head-example" />
+                                                </Badge>
+                                                </div> 
+                                                  </>
                                                   
                                               }
                                              

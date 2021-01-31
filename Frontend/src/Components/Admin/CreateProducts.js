@@ -6,6 +6,8 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import axios from 'axios';
 import swal from 'sweetalert';
+import { DeleteOutlined } from '@ant-design/icons';
+
 
 
 const { Option } = Select;
@@ -22,7 +24,9 @@ export const CreateProducts = () => {
   const [categories, setCategories] = useState([]);
   const [brands, setBrands] = useState([]);
   const [brandId, setBrandId] = useState('');
+  const [priceId, setPriceId] = useState('');
   const [cat, setCat] = useState('');
+  const [prices, setPrices] = useState([]);
   const [productData, setProductData] = useState({
    title: '',
    subTitle: '',
@@ -49,6 +53,10 @@ export const CreateProducts = () => {
 
         ])
       }
+
+      const handleRemoveUploadedImage = name => {
+        setFile(file => file.filter(item => item.name !== name.name))
+    }
       
 
       function handleSizeChange(value) {
@@ -64,6 +72,13 @@ export const CreateProducts = () => {
 
       function handleBrandChange(value) {
         setBrandId(
+          value
+
+        );
+       }
+
+       function handlePriceRangeChange(value) {
+        setPriceId(
           value
 
         );
@@ -90,6 +105,7 @@ export const CreateProducts = () => {
       data.append('offer', offer);
       data.append('cat', cat);
       data.append('brandId', brandId);
+      data.append('priceId', priceId);
       for(let sizes of size) {
         data.append('sizes', sizes);
        }
@@ -137,11 +153,19 @@ export const CreateProducts = () => {
     })
   }
 
+  const fetchPriceRanges = async() => {
+    await axios.get('/api/categories/price-ranges').then(res => {
+        setPrices(res.data.range);
+    })
+}
+
+
 
   useEffect(() => {
 
     fetchCategories();
     fetchBrands();
+    fetchPriceRanges();
     return () => {
     }
   }, [isModalVisible]);
@@ -204,6 +228,23 @@ export const CreateProducts = () => {
                       
                 </Select>
                  </div>
+                 <div className = 'my-3'>
+                <Select
+                      placeholder="Select Price Change.."
+                      onChange={handlePriceRangeChange}
+                      style={{ width: '80%', marginLeft: '22px', marginTop: '6px' }}
+                    > 
+                    {
+                      prices.map(price => {
+                        return(
+                          <Option key = {price._id}> Between {price.minPrice} & {price.maxPrice}</Option>
+
+                        )
+                      })
+                    }
+                      
+                </Select>
+                 </div>
 
                     <div className = 'ml-4'>
                      <Select
@@ -243,6 +284,7 @@ export const CreateProducts = () => {
                          return(
                            <li key = {pic.name}>
                              {pic.name}
+                             <a onClick={() =>handleRemoveUploadedImage(pic)}><DeleteOutlined style = {{marginLeft: '10px', color: 'black'}} /> </a>
                            </li>
 
                          )

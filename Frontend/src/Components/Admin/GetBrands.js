@@ -1,10 +1,12 @@
-import { Button } from 'antd'
+import { Badge, Button } from 'antd'
 import Modal from 'antd/lib/modal/Modal'
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import swal from 'sweetalert'
 import { CreateBrand } from './createBrand'
 import { Layout } from './Layout'
+import { DeleteOutlined } from '@ant-design/icons';
+
 
 export const GetBrands = () => {
     const [brands, setBrands] = useState([]);
@@ -13,7 +15,8 @@ export const GetBrands = () => {
     const [editBrandId, setEditBrandId] = useState('');
     const [success, setSuccess] = useState(false);
     const [isModalVisible, setIsModalVisible] = useState(false);
-
+    const [file, setFile] = useState('');
+    const [image, setImage] = useState('');
 
     
     useEffect(() => {
@@ -32,11 +35,25 @@ export const GetBrands = () => {
         )
     }
 
+    const handleImageChange = (e) => {
+      setFile(
+         e.target.files[0]
+      );
+     }
+
+     const handleRemovePresentImage = name => {
+      setImage(null);
+  }
+
 
 /**************************************************On Submit ***********************************************/
     const submitHandler = (e) => {
         e.preventDefault();
-        axios.put(`/api/categories/brands/update/${editBrandId}`, {name : getBrand.toUpperCase()}).then(res => {
+        let data = new FormData();
+        data.append('name', getBrand.toUpperCase());
+        data.append('file', file);
+        data.append('image', image);
+        axios.put(`/api/categories/brands/update/${editBrandId}`, data).then(res => {
           if(res.status === 200) {
               setSuccess(true);
           swal('Great', res.data.successMessage, 'success');
@@ -80,6 +97,7 @@ export const GetBrands = () => {
        axios.get(`/api/categories/brands/${brandId}`).then(res => {
            setSuccess(true);
            setGetBrand(res.data.brand.name);
+           setImage(res.data.brand.img);
            setSuccess(false);
        })
 
@@ -133,6 +151,14 @@ export const GetBrands = () => {
                                                   <div className="form-group mt-4" style = {{paddingLeft: '62px'}}> 
                                                       <input type="text" className="form-control mb-2 border" id = 'editedBrand' name = 'editedBrand' onChange = {handleBrandChange} value = {getBrand}   />
                                                   </div> 
+                                                  <div className = 'my-3'>
+                                                    <input type="file" name = 'file' multiple onChange = {handleImageChange}/>
+                                                    </div>  
+                                                    <div>
+                                                    <Badge className = 'mt-4 mb-2' count={<a onClick={() =>handleRemovePresentImage(image)}><DeleteOutlined style = {{marginLeft: '10px'}} /></a>}>
+                                                    <img width = '100' height = '100' src = {image} alt = 'images' className="head-example" />
+                                                  </Badge>
+                                                    </div>  
                                              
                                               <button type="submit" className="btn btn-outline-danger mt-4">Submit</button>
                                               </form>

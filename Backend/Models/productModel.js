@@ -48,7 +48,8 @@ const productShema = new mongoonse.Schema({
         }
     ],
     category:  {type: mongoonse.Schema.Types.ObjectId, ref : 'Category', required: true},
-    brand:  {type: mongoonse.Schema.Types.ObjectId, ref : 'Brand', required: true}
+    brand:  {type: mongoonse.Schema.Types.ObjectId, ref : 'Brand', required: true},
+    priceRange:  {type: mongoonse.Schema.Types.ObjectId, ref : 'Price', required: true},
     
 
 

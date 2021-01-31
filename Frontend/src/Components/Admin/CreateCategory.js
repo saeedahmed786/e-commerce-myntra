@@ -7,6 +7,7 @@ import { PlusOutlined  } from '@ant-design/icons';
 import { Layout } from './Layout';
 import { CreateProducts } from './CreateProducts';
 import { CreateBrand } from './createBrand';
+import { CreatePriceRange, PriceRange } from './CreatePriceRange';
 const { Option } = Select;
 
 
@@ -19,6 +20,7 @@ export const CreateCategory = (props) => {
     const [selectCat, setSelectCat] = useState('');
     const [selectSubCat, setSelectSubCat] = useState('');
     const [categories, setCategories] = useState([]);
+    const [file, setFile] = useState('');
 
 
 
@@ -71,7 +73,11 @@ export const CreateCategory = (props) => {
             setSelectSubCat(value);
           }   
 
-
+          const handleImageChange = (e) => {
+            setFile(
+               e.target.files[0]
+            );
+           }
 
           
     /*********************************************** Submit Events ******************************************/
@@ -89,11 +95,16 @@ export const CreateCategory = (props) => {
       })
   }
 
-
+  console.log(file);
     
     const submitSubCatHandler = (e) => {
         e.preventDefault();
-        const submitData = axios.post('/api/categories/sub-category/create', {parentId: selectCat , name: subCategory.toUpperCase()}).then( response => {
+        let data = new FormData();
+        data.append('parentId', selectCat);
+        data.append('name', subCategory.toUpperCase());
+        data.append('file', file);
+
+        const submitData = axios.post('/api/categories/sub-category/create', data).then( response => {
             if(response.status === 200) {
                 swal('Good Job', response.data , 'success');
             } else if(response.status === 201) {
@@ -110,7 +121,12 @@ export const CreateCategory = (props) => {
   
     const handleChildSubCatSubmit = (e) => {
         e.preventDefault();
-        const submitSubCatData = axios.post('/api/categories/child-sub-category/create', {parentId: selectSubCat, name: childSubCategory.toUpperCase()}).then( response => {
+        let formData = new FormData();
+        formData.append('parentId', selectSubCat);
+        formData.append('name', childSubCategory.toUpperCase());
+        formData.append('file', file);
+
+        const submitSubCatData = axios.post('/api/categories/child-sub-category/create', formData).then( response => {
             if(response.status === 200) {
                 swal('Good Job', response.data.successMessage , 'success');
             } else if(response.status === 201) {
@@ -209,6 +225,9 @@ export const CreateCategory = (props) => {
                 <div className="form-group mt-4" style = {{paddingLeft: '62px'}}>
                     <input type="text" className="form-control mb-2" id = 'SubCategory' value = {subCategory} name = 'subCategory' placeholder="Enter Your Sub-Category Name" onChange = {handleCatChange} />
                 </div>
+                <div className = 'my-3'>
+                  <input type="file" name = 'file' multiple onChange = {handleImageChange}/>
+                  </div>  
             <button type="submit" className="btn btn-outline-danger mt-4">Submit</button>
             </form>
             </Modal>
@@ -247,16 +266,14 @@ export const CreateCategory = (props) => {
                 <div className="form-group mt-4" style = {{paddingLeft: '62px'}}> 
                     <input type="text" className="form-control mb-2 border" id = 'childSubCategory' name = 'childSubCategory' value = {childSubCategory} placeholder="Enter Relevant Child Sub-Category" onChange = {handleCatChange} />
                 </div>
+
+                <div className = 'my-3'>
+                  <input type="file" name = 'file' multiple onChange = {handleImageChange}/>
+                  </div>  
             <button type="submit" className="btn btn-outline-danger mt-4">Submit</button>
             </form>
             </Modal>
            
-            </span>
-            <span>
-              <CreateProducts/>
-            </span>
-            <span>
-              <CreateBrand/>
             </span>
             </div>
             </Layout>

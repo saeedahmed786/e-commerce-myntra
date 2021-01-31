@@ -8,15 +8,24 @@ import swal from 'sweetalert';
 export const CreateBrand = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [brand, setBrand] = useState('');
+  const [file, setFile] = useState('');
 
 
   const handleChange = (e) => {
     setBrand(e.target.value);
   }
+  const handleImageChange = (e) => {
+    setFile(
+       e.target.files[0]
+    );
+   }
   
   const submitHandler = (e) => {
     e.preventDefault();
-    axios.post('/api/categories/brands/create', {name : brand.toUpperCase()}).then(res => {
+    let data = new FormData();
+    data.append('name', brand.toUpperCase());
+    data.append('file', file);
+    axios.post('/api/categories/brands/create', data).then(res => {
       console.log(res);
       if(res.status === 200) {
       swal('Great', res.data.successMessage, 'success');
@@ -52,7 +61,10 @@ export const CreateBrand = () => {
           <form className = 'text-center' onSubmit = {submitHandler}>
           <div className="form-group mt-4" style = {{paddingLeft: '62px'}}>
                     <input type="text" className="form-control mb-2" id = 'brand' name = 'brand' placeholder="Enter Your Brand Title" onChange = {handleChange} />
-                </div>            
+                </div>     
+                <div className = 'my-3'>
+                  <input type="file" name = 'file' multiple onChange = {handleImageChange}/>
+                  </div>         
           <button type = 'submit' className = 'btn btn-outline-danger mt-4'>Submit</button>
           </form>
       </Modal>

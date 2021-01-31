@@ -10,6 +10,7 @@ import ReactQuill from 'react-quill';
 import { v4 as uuidv4 } from 'uuid';
 import { Link } from 'react-router-dom'
 import { EditProduct } from './editProduct'
+import { CreateProducts } from './CreateProducts'
 
 
 
@@ -115,7 +116,10 @@ export const GetProducts = () => {
     return (
         <div>
           <Layout sidebar>
-              <h1>Products</h1>
+              <h1 className = 'text-center'>Products</h1>
+              <span className = 'float-right my-2'>
+              <CreateProducts/>
+            </span>
               <table class="table">
                 <thead>
                     <tr>
@@ -160,7 +164,7 @@ export const GetProducts = () => {
                 
                  {
                      product ? 
-                <Modal width = {800} title="Basic Modal" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
+                <Modal width = {800} title="Product" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
                             <div className="row">
                                 <div className="col-md-6 my-4">
                                 <h6>Product Title :</h6>

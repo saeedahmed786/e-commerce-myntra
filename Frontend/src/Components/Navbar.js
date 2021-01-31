@@ -2,6 +2,8 @@ import axios from 'axios';
 import 'antd/dist/antd.css';
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Row, Col, Divider } from 'antd';
+
 
 export const Navbar = () => {
   const [categories, setCategories] = useState([]);
@@ -42,29 +44,32 @@ export const Navbar = () => {
                               {data.name}
                           </Link>
                        <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                         
                         <div className = 'row' style = {{width: '90vw'}}> 
                         {
                           data.children.length > 0 ?
                               data.children.map(sub => {
+
                                 return (
-                                  <div className = 'col-md-3 font-weight-bold' key={data.id} style = {{fontSize: '12px'}}>
+                                  <>
+                                  <div className = 'col-md-2 font-weight-bold drop-nav' id = 'sub-cat' key={data.id} style = {{fontSize: '12px'}}>
                                   <a className="dropdown-item text-danger" style = {{fontSize: '12px'}} key={sub.id} to="/">{sub.name}</a>
                                    
                                    {
                                      sub.children.length > 0 ?
                                      sub.children.map(child => {
                                        return(
-                                        <p className=' ml-4 mt-2'>{child.name}</p>
-                          
+                                       <p> 
+                                       <Link to = {'/products/' + child._id} className='child'>{child.name}</Link>
+                                       </p>
                                           
                                          
                                        )
                                      }) :
                                      null
                                    }
-                                  
                                    </div>
- 
+                                  </>
                                    
                                 )
                               }) : null
